@@ -1,0 +1,28 @@
+language: node_js
+node_js:
+  - "lts/carbon"
+
+jobs:
+  include:
+    - stage: test
+      node_js: "node"
+      os: linux
+      before_script:
+        - npm run build || exit 1
+      after_success:
+        - npm run coverage
+        - 'cat ./coverage/lcov.info | coveralls'
+
+    - stage: platform-test
+      node_js: "lts/carbon"
+      os: linux
+
+    - stage: platform-test
+      node_js: "lts/boron"
+      os: linux
+
+install:
+  - npm install
+
+script:
+  - npm test
