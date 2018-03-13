@@ -1,3 +1,6 @@
+env:
+  global:
+    - CC_TEST_REPORTER_ID=713e953819d7409a50a2284b59ea639bb5b186253c6c9b3c92d4b06e92e88aae
 language: node_js
 node_js:
   - "lts/carbon"
@@ -8,10 +11,14 @@ jobs:
       node_js: "node"
       os: linux
       before_script:
+        - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+        - chmod +x ./cc-test-reporter
         - npm run build || exit 1
+        - sleep 5
+        - ./cc-test-reporter before-build
       after_success:
-        - npm run coverage
         - 'cat ./coverage/lcov.info | coveralls'
+        - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 
     - stage: platform-test
       node_js: "lts/carbon"
@@ -25,4 +32,4 @@ install:
   - npm install
 
 script:
-  - npm test
+  - npm run coverage
